@@ -13,6 +13,7 @@ require "language_pack"
 require "language_pack/shell_helpers"
 
 require 'cloud_foundry/language_pack/extensions'
+require 'json'
 
 begin
   LanguagePack::Instrument.trace 'compile', 'app.compile' do
@@ -21,6 +22,20 @@ begin
       pack.topic("Compiling #{pack.name}")
       pack.log("compile") do
         pack.compile
+      end
+    end
+  end
+  unless ENV['VCAP_SERVICES'].nil?
+    services = JSON.parse(ENV['VCAP_SERVICES'])
+    services.each do |name, details|
+      details.each do |detail|
+        unless detail['credentials']['agent_url'].nil?
+          STDERR.puts("Binary agent for service #{name} detected! Adding to scripts...")
+          agent_url = detail['credentials']['agent_url']
+          script_location = "#{ARGV[0]}/.profile.d/agent_script"
+          system("curl #{agent_url} > #{script_location}")
+          system("chmod a+x #{script_location}")
+        end
       end
     end
   end
@@ -36,3 +51,4 @@ rescue Exception => e
     raise e
   end
 end
+
