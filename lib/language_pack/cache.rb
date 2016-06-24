@@ -5,12 +5,14 @@ require "language_pack"
 class LanguagePack::Cache
   # @param [String] path to the cache store
   def initialize(cache_path)
+    puts "INITIALIZE - CACHE PATH IS #{Pathname.new(cache_path)}"
     @cache_base = Pathname.new(cache_path)
   end
 
   # removes the the specified path from the cache
   # @param [String] relative path from the cache_base
   def clear(path)
+    puts "CACHE was cleared: path was #{path}"
     target = (@cache_base + path)
     target.exist? && target.rmtree
   end
@@ -22,6 +24,7 @@ class LanguagePack::Cache
   # @param [String] path of contents to store. it will be stored using this a relative path from the cache_base.
   # @param [String] relative path to store the cache contents, if nil it will assume the from path
   def store(from, path = nil)
+    puts "STORE: from #{from}, path was #{path}"
     path ||= from
     clear path
     copy from, (@cache_base + path)
@@ -30,6 +33,7 @@ class LanguagePack::Cache
   # Adds file to cache without clearing the destination
   # Use LanguagePack::Cache#store to avoid accidental cache bloat
   def add(from, path = nil)
+    puts "ADDED TO CACHE: from #{from}, path was #{path}"
     path ||= from
     copy from, (@cache_base + path)
   end
@@ -38,11 +42,13 @@ class LanguagePack::Cache
   # @param [String] relative path of the cache contents
   # @param [String] path of where to store it locally, if nil, assume same relative path as the cache contents
   def load(path, dest = nil)
+    puts "LOADED FROM CACHE: #{path}, destination was #{dest}"
     dest ||= path
     copy (@cache_base + path), dest
   end
 
   def load_without_overwrite(path, dest=nil)
+    puts "LOADED (WITHOUT OVERWRITE) FROM CACHE: #{path}, destination was #{dest}"
     dest ||= path
     copy (@cache_base + path), dest, '-a -n'
   end
@@ -51,6 +57,8 @@ class LanguagePack::Cache
   # @param [String] source directory
   # @param [String] destination directory
   def copy(from, to, options='-a')
+    puts "CACHE CONTENTS COPIED FROM #{from} to #{to}"
+
     return false unless File.exist?(from)
     return true if File.expand_path(from) == File.expand_path(to) # see story 80029582
     FileUtils.mkdir_p File.dirname(to)
