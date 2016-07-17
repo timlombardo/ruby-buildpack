@@ -6,7 +6,6 @@ url_to_dependency_map:
     name: jruby
     version: ruby-$1-jruby-$2
   - match: ruby-(\d+\.\d+\.\d+)
-    name: ruby
     version: $1
   - match: node-v?(\d+\.\d+\.\d+)
     name: node
@@ -28,7 +27,6 @@ url_to_dependency_map:
     version: 1.8.0_91
 
 dependencies:
-  - name: node
     version: 4.4.4
     uri: https://pivotal-buildpacks.s3.amazonaws.com/concourse-binaries/node/node-4.4.4-linux-x64.tgz
     md5: 8beeb9a17a81b9832a1ccce02e6d6897
